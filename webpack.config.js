@@ -1,4 +1,5 @@
 const path = require('path');
+var webpack = require('webpack');
 
 module.exports = {
   entry: './client/index.js',
@@ -9,10 +10,7 @@ module.exports = {
   },
   devServer: {
     publicPath: '/build/',
-    hot: true,
-    // proxy: {
-    //   '/api/leaders': 'http://localhost:3000'
-    // }
+    // hot: true,
   },
   module: {
     rules: [
@@ -31,5 +29,7 @@ module.exports = {
         use: ['style-loader', 'css-loader'],
       }
     ]
-    }
+  },
+  resolve: { extensions: ["*", ".js", ".jsx"] },
+  // plugins: [new webpack.HotModuleReplacementPlugin()]
 }
