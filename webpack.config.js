@@ -5,12 +5,12 @@ module.exports = {
   entry: './client/index.js',
   mode: process.env.NODE_ENV,
   output: {
-    path: path.resolve(__dirname, 'build'),
+    path: path.join(__dirname, 'build'),
     filename: 'bundle.js'
   },
   devServer: {
     publicPath: '/build/',
-    // hot: true,
+    hot: true,
   },
   module: {
     rules: [
@@ -31,5 +31,5 @@ module.exports = {
     ]
   },
   resolve: { extensions: ["*", ".js", ".jsx"] },
-  // plugins: [new webpack.HotModuleReplacementPlugin()]
+  plugins: [new webpack.HotModuleReplacementPlugin()]
 }
