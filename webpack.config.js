@@ -9,8 +9,11 @@ module.exports = {
     filename: 'bundle.js'
   },
   devServer: {
-    publicPath: '/build/',
+    publicPath: 'http://localhost:8080/build/',
     hot: true,
+    proxy: {
+      '/films': 'http://localhost:3000'
+    }
   },
   module: {
     rules: [

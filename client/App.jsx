@@ -9,9 +9,12 @@ class App extends Component{
       director: '',
       imdbRating: '',
       imgUrl: '',
+      plot: '',
+      favorites: [],
       didSearch: false,
     };
     this.grabFilm = this.grabFilm.bind(this);
+    this.addFilm = this.addFilm.bind(this);
   }
 
   grabFilm(e){
@@ -22,25 +25,57 @@ class App extends Component{
       .then(res => res.json())
       .then((result) => {
         console.log(result);
+        if(result.Response === 'True'){
         this.setState({
           title: result.Title,
           director: result.Director,
           imdbRating: result.imdbRating,
           imgUrl: result.Poster,
+          plot: result.Plot,
           didSearch: true,
         });
         console.log(this.state);
+      }
       })
       .catch(error => console.log(error));
 
     document.querySelector('#filmTitle').value='';
   }
 
+  addFilm(e){
+    e.preventDefault();
+    const newFilmFavs = [];
+    const filmData = {
+      title: this.state.title,
+      director: this.state.director,
+      imdbRating: this.state.imdbRating,
+      imgUrl: this.state.imgUrl,
+      plot: this.state.plot,
+      watched: 'false'
+    }
+    newFilmFavs.push(filmData);
+    this.setState({
+      favorites: newFilmFavs
+    })
+    fetch('/films', {
+      mode: 'cors',
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+      },
+      method: 'POST',
+      body: JSON.stringify(filmData),
+    })
+      .then(res => res.json())
+      .then(data => console.log('created watchlist record: ', data))
+      .catch(err => console.log('addFilm fetch /films: ERROR: ', err))
+  }
+
   render(){
+    const { didSearch, imgUrl, title, director, imdbRating, plot } = this.state;
     return(
       <div className="App">
         <Search grabFilm={this.grabFilm}/>
-        <FilmSearchDisplay didSearch={this.state.didSearch} imgUrl={this.state.imgUrl} title={this.state.title} director={this.state.director} imdbRating={this.state.imdbRating} />
+        <FilmSearchDisplay addFilm={this.addFilm} didSearch={didSearch} imgUrl={imgUrl} title={title} director={director} imdbRating={imdbRating} plot={plot} />
       </div>
     );
   }
@@ -61,9 +96,11 @@ const FilmSearchDisplay = (props) => {
     return (
       <div className="filmSearchDisplay">
       <img src={props.imgUrl} alt={props.title}></img>
-      <p>Title: {props.title}</p>
-      <p>Director: {props.director}</p>
-      <p>imdb Rating: {props.imdbRating}</p>
+      <p><strong>Title:</strong> {props.title}</p>
+      <p><strong>Director:</strong> {props.director}</p>
+      <p><strong>imdb Rating:</strong> {props.imdbRating}</p>
+      <p><strong>Plot:</strong> {props.plot}</p>
+      <input type="submit" id="addToWatchlist" value="add to watchlist" onClick={props.addFilm} ></input>
     </div>
     )
   } else {
@@ -71,6 +108,10 @@ const FilmSearchDisplay = (props) => {
       <div></div>
     )
   }
+}
+
+const ToWatch = (props) => {
+
 }
 
 
