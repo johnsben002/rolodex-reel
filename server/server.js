@@ -33,8 +33,27 @@ app.get('/', (req, res) => {
 app.post('/films',
   watchlistController.addToList,
   (req, res) => {
-  //add film to databse
+  res.status(200).json({});
 })
+
+app.get('/getFilms',
+  watchlistController.getList,
+  (req, res) => {
+  // console.log(res.locals.films);
+  res.status(200).json(res.locals.films);
+  })
+
+/* ERROR HANDLER */
+app.use((err, req, res, next) => {
+  const defaultErr = {
+    log: 'Express error handler caught unknown middleware error',
+    status: 400,
+    message: { err: 'An error occurred' },
+  };
+  const errorObj = Object.assign({}, defaultErr, err);
+  console.log(errorObj.log);
+  return res.status(errorObj.status).json(errorObj.message);
+});
 
 
 app.listen(PORT, function(){

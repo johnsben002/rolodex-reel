@@ -10,11 +10,13 @@ class App extends Component{
       imdbRating: '',
       imgUrl: '',
       plot: '',
-      favorites: [],
+      films: [],
       didSearch: false,
+      fetchedFilms: false
     };
     this.grabFilm = this.grabFilm.bind(this);
     this.addFilm = this.addFilm.bind(this);
+    this.getFilms = this.getFilms.bind(this);
   }
 
   grabFilm(e){
@@ -42,9 +44,23 @@ class App extends Component{
     document.querySelector('#filmTitle').value='';
   }
 
+  getFilms(e){
+    e.preventDefault();
+    fetch('/getFilms')
+      .then(resp => resp.json())
+      .then((films) => {
+        console.log('films:', films);
+        // if (!Array.isArray(films)) films = [];
+        return this.setState({
+          films: films,
+          fetchedChars: true
+        });
+      })
+      .catch(err => console.log('componentDidMount: get films: ERROR: ', err));
+  }
+
   addFilm(e){
     e.preventDefault();
-    const newFilmFavs = [];
     const filmData = {
       title: this.state.title,
       director: this.state.director,
@@ -53,10 +69,6 @@ class App extends Component{
       plot: this.state.plot,
       watched: 'false'
     }
-    newFilmFavs.push(filmData);
-    this.setState({
-      favorites: newFilmFavs
-    })
     fetch('/films', {
       mode: 'cors',
       headers: {
@@ -70,22 +82,43 @@ class App extends Component{
       .catch(err => console.log('addFilm fetch /films: ERROR: ', err))
   }
 
+  // componentDidUpdate() {
+  //   fetch('/getFilms')
+  //     .then(resp => resp.json())
+  //     .then((films) => {
+  //       console.log('films:', films);
+  //       // if (!Array.isArray(films)) films = [];
+  //       return this.setState({
+  //         films: films,
+  //         fetchedChars: true
+  //       });
+  //     })
+  //     .catch(err => console.log('componentDidMount: get films: ERROR: ', err));
+  // }
+
   render(){
-    const { didSearch, imgUrl, title, director, imdbRating, plot } = this.state;
+    const { didSearch, imgUrl, title, director, imdbRating, plot, films } = this.state;
+    const favFilmList = [];
+    for (let i = 0; i < films.length; i += 1) {
+      favFilmList.push(<Fav films={films[i]} key={i} />)
+    }
     return(
       <div className="App">
-        <Search grabFilm={this.grabFilm}/>
-        <FilmSearchDisplay addFilm={this.addFilm} didSearch={didSearch} imgUrl={imgUrl} title={title} director={director} imdbRating={imdbRating} plot={plot} />
+        <Search getFilms={this.getFilms} grabFilm={this.grabFilm}/>
+        <FilmSearchDisplay  addFilm={this.addFilm} didSearch={didSearch} imgUrl={imgUrl} title={title} director={director} imdbRating={imdbRating} plot={plot} />
+        {favFilmList}
       </div>
     );
   }
 }
 
 const Search = (props) => {
+  console.log('search props', props)
   return (
     <form>
       <input type="text" id="filmTitle" placeholder="Search Films..."></input>
       <input type="submit" id="search" value="submit" onClick={props.grabFilm}></input>
+      <input type="submit" id="getFavs" value="view watchlist" onClick={props.getFilms}></input>
     </form>
   )
 }
@@ -110,8 +143,15 @@ const FilmSearchDisplay = (props) => {
   }
 }
 
-const ToWatch = (props) => {
-
+const Fav = (props) => {
+  return (
+    <div className="favs">
+    <img src = {props.films.imgurl} alt={props.films.title}></img>
+    <p><strong>Title:</strong> {props.films.title}</p>
+    <p><strong>Director:</strong> {props.films.director}</p>
+    <p><strong>imdb Rating:</strong> {props.films.imdbrating}</p>
+  </div>
+  )
 }
 
 
