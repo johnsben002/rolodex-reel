@@ -39,11 +39,20 @@ watchlistController.getList = (req, res, next) => {
     })
 }
 
-watchlistController.updateList = (req, res, next) => {
-
-}
-
 watchlistController.deleteFromList = (req, res, next) => {
+  const deleteTitle = req.query.title;
+  const deleteQuery = {
+    text: 'DELETE FROM watchlist WHERE watchlist.title = $1',
+    values: [deleteTitle]
+  }
+  db 
+    .query(deleteQuery)
+    .then(next())
+    .catch({
+      log: 'Express error handler caught deleteFromList middleware error',
+      status: 400,
+      message: { err: err.message },
+    })
 
 }
 

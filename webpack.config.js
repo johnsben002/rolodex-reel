@@ -12,8 +12,9 @@ module.exports = {
     publicPath: 'http://localhost:8080/build/',
     hot: true,
     proxy: {
-      '/films': 'http://localhost:3000',
-      '/getFilms': 'http://localhost:3000'
+      '/api/films': 'http://localhost:3000',
+      '/api/getFilms': 'http://localhost:3000',
+      '/api/deleteFilm': 'http://localhost:3000'
     }
   },
   module: {

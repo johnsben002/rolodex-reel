@@ -17,6 +17,7 @@ class App extends Component{
     this.grabFilm = this.grabFilm.bind(this);
     this.addFilm = this.addFilm.bind(this);
     this.getFilms = this.getFilms.bind(this);
+    this.deleteFilm = this.deleteFilm.bind(this);
   }
 
   grabFilm(e){
@@ -46,14 +47,14 @@ class App extends Component{
 
   getFilms(e){
     e.preventDefault();
-    fetch('/getFilms')
+    fetch('/api/getFilms')
       .then(resp => resp.json())
       .then((films) => {
         console.log('films:', films);
         // if (!Array.isArray(films)) films = [];
         return this.setState({
           films: films,
-          fetchedChars: true
+          fetchedFilms: true
         });
       })
       .catch(err => console.log('componentDidMount: get films: ERROR: ', err));
@@ -69,7 +70,7 @@ class App extends Component{
       plot: this.state.plot,
       watched: 'false'
     }
-    fetch('/films', {
+    fetch('/api/films', {
       mode: 'cors',
       headers: {
         "Content-Type": "application/json; charset=utf-8",
@@ -82,25 +83,27 @@ class App extends Component{
       .catch(err => console.log('addFilm fetch /films: ERROR: ', err))
   }
 
-  // componentDidUpdate() {
-  //   fetch('/getFilms')
-  //     .then(resp => resp.json())
-  //     .then((films) => {
-  //       console.log('films:', films);
-  //       // if (!Array.isArray(films)) films = [];
-  //       return this.setState({
-  //         films: films,
-  //         fetchedChars: true
-  //       });
-  //     })
-  //     .catch(err => console.log('componentDidMount: get films: ERROR: ', err));
-  // }
+  deleteFilm(e){
+    e.preventDefault();
+    const deleteTitle = e.target.title;
+    console.log(JSON.stringify(deleteTitle));
+    fetch(`/api/deleteFilm?title=${deleteTitle}`, {
+      method: 'DELETE',
+    })
+      .then(res => res.text())
+      .then(text => console.log('deleted from watchlist: ', text))
+      .catch(err => console.log('deleteFilm fetch ERROR: ', err))
+  }
+
+  componentDidUpdate(){
+    return getFilms();
+  }
 
   render(){
     const { didSearch, imgUrl, title, director, imdbRating, plot, films } = this.state;
     const favFilmList = [];
     for (let i = 0; i < films.length; i += 1) {
-      favFilmList.push(<Fav films={films[i]} key={i} />)
+      favFilmList.push(<Fav films={films[i]} deleteFilm={this.deleteFilm} key={i} />)
     }
     return(
       <div className="App">
@@ -150,6 +153,7 @@ const Fav = (props) => {
     <p><strong>Title:</strong> {props.films.title}</p>
     <p><strong>Director:</strong> {props.films.director}</p>
     <p><strong>imdb Rating:</strong> {props.films.imdbrating}</p>
+    <input type="submit" id="delete" title={props.films.title} value="remove from watchlist" onClick={props.deleteFilm} ></input>
   </div>
   )
 }
