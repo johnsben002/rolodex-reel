@@ -45,7 +45,7 @@ app.get('/api/getFilms',
 app.delete('/api/deleteFilm', 
   watchlistController.deleteFromList,
   (req, res) => {
-    res.status(200).json('Im still sending')
+    res.status(200).json({})
   })
 
 /* ERROR HANDLER */

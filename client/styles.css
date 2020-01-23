@@ -1,0 +1,80 @@
+body {
+  background: #084C61;
+  font-family: 'Lato', sans-serif;
+}
+
+.searchBar {
+  margin: 0 1vw;
+} 
+
+#filmTitle {
+  width: 30%;
+  height: 25px;
+  border-radius: 4px;
+  border: 1px solid #D4D4D4;
+  margin-right: 5px;
+  padding: 0 5px;
+}
+
+#search {
+  width: 8%;
+  height: 26px;
+  border-radius: 4px;
+  margin-left: 5px;
+  border: 1px solid #D4D4D4;
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+  font-weight: lighter;
+}
+
+.btn {
+  height: 30px;
+  width: 60%;
+  border-radius: 4px;
+  border: 1px solid #084C61;
+  color: #084C61;
+  font-family: 'Lato', sans-serif;
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+  font-weight: lighter;
+  align-self: flex-end;
+}
+
+.watchListDiv {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+h1 {
+  font-style: italic;
+}
+
+h1, h2, h4 {
+  color: white;
+}
+
+h2 {
+  margin-bottom: 0;
+}
+
+.filmImage {
+  position: relative;
+}
+
+.favs, .filmSearchDisplay {
+  margin: 1vw;
+  display: flex;
+  height: 30vw;
+  width: 45vw;
+  background: white;
+  border-radius: 4px;
+  overflow: hidden;
+}
+ 
+.filmInfo {
+  height: 98%;
+  margin: 0 15px;
+  display: flex;
+  flex-direction: column; 
+  justify-content: space-between;
+}

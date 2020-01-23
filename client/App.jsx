@@ -1,7 +1,9 @@
-import React, { Component} from "react";
+import React, { PureComponent} from "react";
 import {hot} from "react-hot-loader";
 
-class App extends Component{
+import './styles.css';
+
+class App extends PureComponent{
   constructor(props, context) {
     super(props);
     this.state = {
@@ -18,6 +20,7 @@ class App extends Component{
     this.addFilm = this.addFilm.bind(this);
     this.getFilms = this.getFilms.bind(this);
     this.deleteFilm = this.deleteFilm.bind(this);
+    this.getFilmsFunc = this.getFilmsFunc.bind(this);
   }
 
   grabFilm(e){
@@ -45,19 +48,31 @@ class App extends Component{
     document.querySelector('#filmTitle').value='';
   }
 
-  getFilms(e){
-    e.preventDefault();
+  getFilmsFunc(){
     fetch('/api/getFilms')
       .then(resp => resp.json())
       .then((films) => {
-        console.log('films:', films);
-        // if (!Array.isArray(films)) films = [];
         return this.setState({
           films: films,
           fetchedFilms: true
         });
       })
       .catch(err => console.log('componentDidMount: get films: ERROR: ', err));
+  }
+
+  componentDidMount(){
+    return this.getFilmsFunc();
+  }
+
+
+  getFilms(e){
+    return this.getFilmsFunc();
+  }
+
+  componentDidUpdate(prevState){
+    if(this.state.films !== prevState.films){
+      return this.getFilms();
+    }
   }
 
   addFilm(e){
@@ -79,7 +94,12 @@ class App extends Component{
       body: JSON.stringify(filmData),
     })
       .then(res => res.json())
-      .then(data => console.log('created watchlist record: ', data))
+      .then(data => {
+        console.log('created watchlist record: ', data)
+        return this.setState({
+          didSearch: false
+        })
+      })
       .catch(err => console.log('addFilm fetch /films: ERROR: ', err))
   }
 
@@ -91,12 +111,10 @@ class App extends Component{
       method: 'DELETE',
     })
       .then(res => res.text())
-      .then(text => console.log('deleted from watchlist: ', text))
+      .then(text => {
+        console.log('deleted from watchlist: ', text);
+      })
       .catch(err => console.log('deleteFilm fetch ERROR: ', err))
-  }
-
-  componentDidUpdate(){
-    return getFilms();
   }
 
   render(){
@@ -107,21 +125,29 @@ class App extends Component{
     }
     return(
       <div className="App">
-        <Search getFilms={this.getFilms} grabFilm={this.grabFilm}/>
-        <FilmSearchDisplay  addFilm={this.addFilm} didSearch={didSearch} imgUrl={imgUrl} title={title} director={director} imdbRating={imdbRating} plot={plot} />
-        {favFilmList}
+        <div className='searchBar'>
+          <h1>What do you want to watch?</h1>
+          <Search getFilms={this.getFilms} grabFilm={this.grabFilm}/>
+          <h2>Watchlist</h2>
+        </div>
+        <div className="searchResult">
+          <FilmSearchDisplay inOrderAdd={this.inOrderAdd} addFilm={this.addFilm} didSearch={didSearch} imgUrl={imgUrl} title={title} director={director} imdbRating={imdbRating} plot={plot} />
+        </div>
+        <div className='watchListDiv'>
+          {favFilmList}
+        </div>  
       </div>
     );
   }
 }
 
 const Search = (props) => {
-  console.log('search props', props)
+
   return (
     <form>
       <input type="text" id="filmTitle" placeholder="Search Films..."></input>
-      <input type="submit" id="search" value="submit" onClick={props.grabFilm}></input>
-      <input type="submit" id="getFavs" value="view watchlist" onClick={props.getFilms}></input>
+      <input type="submit" id="search" value="Enter" onClick={props.grabFilm}></input>
+      {/* <input type="submit" id="getFavs" value="view watchlist" onClick={props.getFilms}></input> */}
     </form>
   )
 }
@@ -131,12 +157,16 @@ const FilmSearchDisplay = (props) => {
   if (didSearch === true) {
     return (
       <div className="filmSearchDisplay">
-      <img src={props.imgUrl} alt={props.title}></img>
-      <p><strong>Title:</strong> {props.title}</p>
-      <p><strong>Director:</strong> {props.director}</p>
-      <p><strong>imdb Rating:</strong> {props.imdbRating}</p>
-      <p><strong>Plot:</strong> {props.plot}</p>
-      <input type="submit" id="addToWatchlist" value="add to watchlist" onClick={props.addFilm} ></input>
+        <img src={props.imgUrl} alt={props.title} className="filmImage"></img>
+      <div className="filmInfo">
+        <div>
+          <h3>{props.title}</h3>
+          <p><strong>Director</strong> &mdash; {props.director}</p>
+          <p><strong>imdb Rating</strong> &mdash; {props.imdbRating}</p>
+          <p><strong>Plot</strong> &mdash; {props.plot}</p>
+        </div>
+        <input type="submit" className="btn" id="addToWatchlist" value="add to watchlist" onClick={props.addFilm} ></input>
+      </div>
     </div>
     )
   } else {
@@ -149,12 +179,17 @@ const FilmSearchDisplay = (props) => {
 const Fav = (props) => {
   return (
     <div className="favs">
-    <img src = {props.films.imgurl} alt={props.films.title}></img>
-    <p><strong>Title:</strong> {props.films.title}</p>
-    <p><strong>Director:</strong> {props.films.director}</p>
-    <p><strong>imdb Rating:</strong> {props.films.imdbrating}</p>
-    <input type="submit" id="delete" title={props.films.title} value="remove from watchlist" onClick={props.deleteFilm} ></input>
-  </div>
+      <img src = {props.films.imgurl} alt={props.films.title} className="filmImg"></img>
+        <div className="filmInfo">
+          <div>
+            <h3>{props.films.title}</h3>
+            <p><strong>Director</strong> &mdash; {props.films.director}</p>
+            <p><strong>imdb Rating</strong> &mdash; {props.films.imdbrating}</p>
+            <p><strong>Plot</strong> &mdash; {props.films.plot}</p>
+          </div>
+          <input type="submit" className="btn" id="delete" title={props.films.title} value="remove from watchlist" onClick={props.deleteFilm} ></input>
+        </div>
+      </div>
   )
 }
 
