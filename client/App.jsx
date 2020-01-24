@@ -71,7 +71,7 @@ class App extends PureComponent{
 
   componentDidUpdate(prevState){
     if(this.state.films !== prevState.films){
-      return this.getFilms();
+      return this.getFilmsFunc();
     }
   }
 

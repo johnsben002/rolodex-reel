@@ -11,7 +11,7 @@ const watchlistController = require('./watchlistController');
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json());
 
-app.use('/build', express.static(path.resolve(__dirname, 'build')));
+app.use('/build', express.static(path.resolve(__dirname, 'build/')));
 
 /**
  * FLOW TEST
